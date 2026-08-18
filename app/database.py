@@ -1,6 +1,9 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
+# متغير معرف لمكان قاعدة البيانات لإلغاء الاعتماد على المجلد المحلي
+DB_PATH = "supabase_cloud"
+
 # بيانات الاتصال بقاعدة بيانات Supabase (Transaction pooler)
 DB_HOST = "aws-0-ap-south-1.pooler.supabase.com"
 DB_NAME = "postgres"
@@ -10,27 +13,27 @@ DB_PORT = "6543"
 
 
 def get_connection():
-    """إنشاء اتصال بقاعدة البيانات السحابية Supabase مع إرجاع الصفوف كـ Dictionary"""
-    conn = psycopg2.connect(
-        host=DB_HOST,
-        database=DB_NAME,
-        user=DB_USER,
-        password=DB_PASS,
-        port=DB_PORT,
-        cursor_factory=RealDictCursor,
-    )
-    return conn
+  """إنشاء اتصال بقاعدة البيانات السحابية Supabase مع إرجاع الصفوف كـ Dictionary"""
+  conn = psycopg2.connect(
+      host=DB_HOST,
+      database=DB_NAME,
+      user=DB_USER,
+      password=DB_PASS,
+      port=DB_PORT,
+      cursor_factory=RealDictCursor,
+  )
+  return conn
 
 
 def init_db():
-    """إنشاء الجداول والبيانات الافتراضية في Supabase تلقائياً عند أول تشغيل"""
-    conn = None
-    try:
-        conn = get_connection()
-        cursor = conn.cursor()
+  """إنشاء الجداول والبيانات الافتراضية في Supabase تلقائياً عند أول تشغيل"""
+  conn = None
+  try:
+    conn = get_connection()
+    cursor = conn.cursor()
 
-        # 1. جدول الإعدادات والقوائم المنسدلة
-        cursor.execute("""
+    # 1. جدول الإعدادات والقوائم المنسدلة
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS settings_options (
             id SERIAL PRIMARY KEY,
             category VARCHAR(50) NOT NULL,
@@ -38,8 +41,8 @@ def init_db():
         );
         """)
 
-        # 2. جدول الأزواج
-        cursor.execute("""
+    # 2. جدول الأزواج
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS pairs (
             id SERIAL PRIMARY KEY,
             pair_number VARCHAR(50) UNIQUE NOT NULL,
@@ -53,8 +56,8 @@ def init_db():
         );
         """)
 
-        # 3. جدول سجل الإنتاج (البطون)
-        cursor.execute("""
+    # 3. جدول سجل الإنتاج (البطون)
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS production (
             id SERIAL PRIMARY KEY,
             pair_number VARCHAR(50) NOT NULL,
@@ -68,8 +71,8 @@ def init_db():
         );
         """)
 
-        # 4. جدول الفروخ
-        cursor.execute("""
+    # 4. جدول الفروخ
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS chicks (
             id SERIAL PRIMARY KEY,
             ring_number VARCHAR(50) UNIQUE NOT NULL,
@@ -87,8 +90,8 @@ def init_db():
         );
         """)
 
-        # 5. جدول الأرشيف
-        cursor.execute("""
+    # 5. جدول الأرشيف
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS archive (
             id SERIAL PRIMARY KEY,
             ring_number VARCHAR(50) NOT NULL,
@@ -100,8 +103,8 @@ def init_db():
         );
         """)
 
-        # 6. جدول الطيور الفردية (جميع الطيور والشهادات)
-        cursor.execute("""
+    # 6. جدول الطيور الفردية (جميع الطيور والشهادات)
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS individual_birds (
             id SERIAL PRIMARY KEY,
             ring_number VARCHAR(50) UNIQUE NOT NULL,
@@ -118,81 +121,78 @@ def init_db():
         );
         """)
 
-        # إضافة الألوان الخاصة بك تلقائياً إذا كان الجدول فارغاً
-        cursor.execute(
-            "SELECT COUNT(*) FROM settings_options WHERE category = 'color'"
-        )
-        if cursor.fetchone()['count'] == 0:
-            custom_colors = [
-                (
-                    'color',
-                    'لاتينو اورنج اوبلاين (Lutino Orange Opaline)',
-                ),
-                ('color', 'لاتينو اورنج فيس (Lutino Orange Face)'),
-                ('color', 'لاتينو رد اوبلاين (Lutino Red Opaline)'),
-                ('color', 'لاتينو رد فيس (Lutino Red Face)'),
-                ('color', 'البينو (Albino)'),
-                ('color', 'اينو(كريمينو) (Ino/Creamino)'),
-                ('color', 'سينمون فيس (Cinnamon Face)'),
-                ('color', 'سينمون اوبلاين (Cinnamon Opaline)'),
-                ('color', 'قرين رد فيس (Green Red Face)'),
-                ('color', 'قرين رد اوبلاين (Green Red Opaline)'),
-                ('color', 'قرين اورنج اوبلاين (Green Orange Opaline)'),
-                ('color', 'بلو اوبلاين (Blue Opaline)'),
-                ('color', 'رصاصي فيس (Grey Face)'),
-                ('color', 'رصاصي اوبلاين (Grey Opaline)'),
-                ('color', 'بلو بايد (Blue Pied)'),
-                ('color', 'باليد اوبلاين (Pied Opaline)'),
-                ('color', 'بلو سبلت البينو (Blue Split Albino)'),
-            ]
-            cursor.executemany(
-                "INSERT INTO settings_options (category, value) VALUES (%s, %s)",
-                custom_colors,
-            )
+    # إضافة الألوان الخاصة بك تلقائياً إذا كان الجدول فارغاً
+    cursor.execute(
+        "SELECT COUNT(*) FROM settings_options WHERE category = 'color'"
+    )
+    if cursor.fetchone()['count'] == 0:
+      custom_colors = [
+          ('color', 'لاتينو اورنج اوبلاين (Lutino Orange Opaline)'),
+          ('color', 'لاتينو اورنج فيس (Lutino Orange Face)'),
+          ('color', 'لاتينو رد اوبلاين (Lutino Red Opaline)'),
+          ('color', 'لاتينو رد فيس (Lutino Red Face)'),
+          ('color', 'البينو (Albino)'),
+          ('color', 'اينو(كريمينو) (Ino/Creamino)'),
+          ('color', 'سينمون فيس (Cinnamon Face)'),
+          ('color', 'سينمون اوبلاين (Cinnamon Opaline)'),
+          ('color', 'قرين رد فيس (Green Red Face)'),
+          ('color', 'قرين رد اوبلاين (Green Red Opaline)'),
+          ('color', 'قرين اورنج اوبلاين (Green Orange Opaline)'),
+          ('color', 'بلو اوبلاين (Blue Opaline)'),
+          ('color', 'رصاصي فيس (Grey Face)'),
+          ('color', 'رصاصي اوبلاين (Grey Opaline)'),
+          ('color', 'بلو بايد (Blue Pied)'),
+          ('color', 'باليد اوبلاين (Pied Opaline)'),
+          ('color', 'بلو سبلت البينو (Blue Split Albino)'),
+      ]
+      cursor.executemany(
+          "INSERT INTO settings_options (category, value) VALUES (%s, %s)",
+          custom_colors,
+      )
 
-        # إضافة الخيارات الافتراضية للقطاعات الأخرى
-        cursor.execute(
-            "SELECT COUNT(*) FROM settings_options WHERE category != 'color'"
-        )
-        if cursor.fetchone()['count'] == 0:
-            default_options = [
-                ('pair_status', 'إنتاج'),
-                ('pair_status', 'راحة'),
-                ('pair_status', 'مباع'),
-                ('pair_status', 'نافق'),
-                ('chick_status', 'محتفظ به'),
-                ('chick_status', 'للبيع'),
-                ('chick_status', 'تم البيع'),
-                ('chick_status', 'نافق'),
-                ('gender', 'ذكر'),
-                ('gender', 'أنثى'),
-                ('gender', 'بانتظار DNA'),
-                ('gender', 'غير معروف'),
-                ('archive_reason', 'بيع'),
-                ('archive_reason', 'نفوق'),
-                ('archive_reason', 'استبعاد'),
-            ]
-            cursor.executemany(
-                "INSERT INTO settings_options (category, value) VALUES (%s, %s)",
-                default_options,
-            )
+    # إضافة الخيارات الافتراضية للقطاعات الأخرى
+    cursor.execute(
+        "SELECT COUNT(*) FROM settings_options WHERE category != 'color'"
+    )
+    if cursor.fetchone()['count'] == 0:
+      default_options = [
+          ('pair_status', 'إنتاج'),
+          ('pair_status', 'راحة'),
+          ('pair_status', 'مباع'),
+          ('pair_status', 'نافق'),
+          ('chick_status', 'محتفظ به'),
+          ('chick_status', 'للبيع'),
+          ('chick_status', 'تم البيع'),
+          ('chick_status', 'نافق'),
+          ('gender', 'ذكر'),
+          ('gender', 'أنثى'),
+          ('gender', 'بانتظار DNA'),
+          ('gender', 'غير معروف'),
+          ('archive_reason', 'بيع'),
+          ('archive_reason', 'نفوق'),
+          ('archive_reason', 'استبعاد'),
+      ]
+      cursor.executemany(
+          "INSERT INTO settings_options (category, value) VALUES (%s, %s)",
+          default_options,
+      )
 
-        conn.commit()
-        print("تم الاتصال بـ Supabase وإنشاء الجداول بنجاح!")
-    except Exception as e:
-        print(f"خطأ في الاتصال بالسحابة: {e}")
-    finally:
-        if conn:
-            conn.close()
+    conn.commit()
+    print("تم الاتصال بـ Supabase وإنشاء الجداول بنجاح!")
+  except Exception as e:
+    print(f"خطأ في الاتصال بالسحابة: {e}")
+  finally:
+    if conn:
+      conn.close()
 
 
 def get_pairs_with_counts():
-    """جلب بيانات الأزواج مع حساب عدد البطون وإجمالي الفروخ تلقائياً"""
-    conn = None
-    try:
-        conn = get_connection()
-        cursor = conn.cursor()
-        query = """
+  """جلب بيانات الأزواج مع حساب عدد البطون وإجمالي الفروخ تلقائياً بالترتيب الرقمي الصحيح"""
+  conn = None
+  try:
+    conn = get_connection()
+    cursor = conn.cursor()
+    query = """
         SELECT 
             p.id,
             p.pair_number,
@@ -208,18 +208,23 @@ def get_pairs_with_counts():
         FROM pairs p
         LEFT JOIN production pr ON p.pair_number = pr.pair_number
         GROUP BY p.id, p.pair_number, p.male_ring, p.female_ring, p.male_color, p.female_color, p.status, p.notes, p.image_path
-        ORDER BY p.pair_number ASC
+        ORDER BY 
+            CASE 
+                WHEN p.pair_number ~ '^[0-9]+$' THEN CAST(p.pair_number AS INTEGER)
+                ELSE 999999 
+            END ASC, 
+            p.pair_number ASC
         """
-        cursor.execute(query)
-        rows = cursor.fetchall()
-        return rows
-    except Exception as e:
-        print(f"Error in get_pairs_with_counts: {e}")
-        return []
-    finally:
-        if conn:
-            conn.close()
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    return rows
+  except Exception as e:
+    print(f"Error in get_pairs_with_counts: {e}")
+    return []
+  finally:
+    if conn:
+      conn.close()
 
 
 if __name__ == "__main__":
-    init_db()
+  init_db()

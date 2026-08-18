@@ -1,18 +1,25 @@
-import sqlite3
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
-    QFrame, QGridLayout, QGraphicsDropShadowEffect,
-    QTableWidget, QTableWidgetItem, QHeaderView
-)
+from app.database import get_connection
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
-from app.database import get_connection
+from PySide6.QtWidgets import (
+    QFrame,
+    QGraphicsDropShadowEffect,
+    QGridLayout,
+    QHeaderView,
+    QLabel,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
+
 
 class StatBox(QFrame):
-    def __init__(self, title, value, subtext="", color_hex="#3182CE"):
-        super().__init__()
-        self.setObjectName("StatBox")
-        self.setStyleSheet(f"""
+
+  def __init__(self, title, value, subtext='', color_hex='#3182CE'):
+    super().__init__()
+    self.setObjectName('StatBox')
+    self.setStyleSheet(f"""
             QFrame#StatBox {{
                 background-color: #2D3748;
                 border-radius: 10px;
@@ -21,143 +28,199 @@ class StatBox(QFrame):
             }}
         """)
 
-        shadow = QGraphicsDropShadowEffect(self)
-        shadow.setBlurRadius(12)
-        shadow.setColor(QColor(0, 0, 0, 50))
-        shadow.setOffset(0, 3)
-        self.setGraphicsEffect(shadow)
+    shadow = QGraphicsDropShadowEffect(self)
+    shadow.setBlurRadius(12)
+    shadow.setColor(QColor(0, 0, 0, 50))
+    shadow.setOffset(0, 3)
+    self.setGraphicsEffect(shadow)
 
-        layout = QVBoxLayout(self)
-        layout.setSpacing(5)
+    layout = QVBoxLayout(self)
+    layout.setSpacing(5)
 
-        self.title_lbl = QLabel(title)
-        self.title_lbl.setStyleSheet("color: #A0AEC0; font-size: 13px; font-weight: bold;")
-        
-        self.val_lbl = QLabel(str(value))
-        self.val_lbl.setStyleSheet("color: #FFFFFF; font-size: 26px; font-weight: bold;")
+    self.title_lbl = QLabel(title)
+    self.title_lbl.setStyleSheet(
+        'color: #A0AEC0; font-size: 13px; font-weight: bold;'
+    )
 
-        self.sub_lbl = QLabel(subtext)
-        self.sub_lbl.setStyleSheet("color: #718096; font-size: 11px;")
+    self.val_lbl = QLabel(str(value))
+    self.val_lbl.setStyleSheet(
+        'color: #FFFFFF; font-size: 26px; font-weight: bold;'
+    )
 
-        layout.addWidget(self.title_lbl)
-        layout.addWidget(self.val_lbl)
-        layout.addWidget(self.sub_lbl)
+    self.sub_lbl = QLabel(subtext)
+    self.sub_lbl.setStyleSheet('color: #718096; font-size: 11px;')
 
-    def update_value(self, value, subtext=""):
-        self.val_lbl.setText(str(value))
-        if subtext:
-            self.sub_lbl.setText(subtext)
+    layout.addWidget(self.title_lbl)
+    layout.addWidget(self.val_lbl)
+    layout.addWidget(self.sub_lbl)
+
+  def update_value(self, value, subtext=''):
+    self.val_lbl.setText(str(value))
+    if subtext:
+      self.sub_lbl.setText(subtext)
 
 
 class StatisticsPage(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.setLayoutDirection(Qt.RightToLeft)
-        self.init_ui()
 
-    def init_ui(self):
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(20, 20, 20, 20)
-        layout.setSpacing(20)
+  def __init__(self):
+    super().__init__()
+    self.setLayoutDirection(Qt.RightToLeft)
+    self.init_ui()
 
-        header = QLabel("الإحصائيات وتقارير الكفاءة")
-        header.setStyleSheet("color: #FFFFFF; font-size: 22px; font-weight: bold;")
-        layout.addWidget(header)
+  def init_ui(self):
+    layout = QVBoxLayout(self)
+    layout.setContentsMargins(20, 20, 20, 20)
+    layout.setSpacing(20)
 
-        grid = QGridLayout()
-        grid.setSpacing(15)
+    header = QLabel('الإحصائيات وتقارير الكفاءة')
+    header.setStyleSheet('color: #FFFFFF; font-size: 22px; font-weight: bold;')
+    layout.addWidget(header)
 
-        self.box_pairs = StatBox("إجمالي الأزواج", "0", "جميع الأزواج المسجلة", "#3182CE")
-        self.box_chicks = StatBox("إجمالي الفروخ", "0", "جميع الفروخ المسجلة", "#38A169")
-        self.box_kept = StatBox("المحتفظ بهم", "0", "فروخ في المزرعة", "#DD6B20")
-        self.box_hatch_rate = StatBox("نسبة الفقس العامة", "0%", "معدل تفريخ البيض", "#E53E3E")
-        self.box_sold_chicks = StatBox("الفروخ المباعة", "0", "تم بيعها", "#319795")
-        self.box_best_pair = StatBox("أعلى زوج إنتاجاً", "-", "أعلى عدد فروخ", "#805AD5")
+    grid = QGridLayout()
+    grid.setSpacing(15)
 
-        grid.addWidget(self.box_pairs, 0, 0)
-        grid.addWidget(self.box_chicks, 0, 1)
-        grid.addWidget(self.box_kept, 0, 2)
-        
-        grid.addWidget(self.box_hatch_rate, 1, 0)
-        grid.addWidget(self.box_sold_chicks, 1, 1)
-        grid.addWidget(self.box_best_pair, 1, 2)
+    self.box_pairs = StatBox(
+        'إجمالي الأزواج', '0', 'جميع الأزواج المسجلة', '#3182CE'
+    )
+    self.box_chicks = StatBox(
+        'إجمالي الفروخ', '0', 'جميع الفروخ المسجلة', '#38A169'
+    )
+    self.box_kept = StatBox('المحتفظ بهم', '0', 'فروخ في المزرعة', '#DD6B20')
+    self.box_hatch_rate = StatBox(
+        'نسبة الفقس العامة', '0%', 'معدل تفريخ البيض', '#E53E3E'
+    )
+    self.box_sold_chicks = StatBox('الفروخ المباعة', '0', 'تم بيعها', '#319795')
+    self.box_best_pair = StatBox(
+        'أعلى زوج إنتاجاً', '-', 'أعلى عدد فروخ', '#805AD5'
+    )
 
-        layout.addLayout(grid)
+    grid.addWidget(self.box_pairs, 0, 0)
+    grid.addWidget(self.box_chicks, 0, 1)
+    grid.addWidget(self.box_kept, 0, 2)
 
-        # جدول تقرير كفاءة الأزواج
-        tbl_title = QLabel("تقرير كفاءة وأداء الأزواج التفصيلي")
-        tbl_title.setStyleSheet("color: #FFFFFF; font-size: 16px; font-weight: bold; margin-top: 10px;")
-        layout.addWidget(tbl_title)
+    grid.addWidget(self.box_hatch_rate, 1, 0)
+    grid.addWidget(self.box_sold_chicks, 1, 1)
+    grid.addWidget(self.box_best_pair, 1, 2)
 
-        self.table_performance = QTableWidget()
-        self.table_performance.setColumnCount(6)
-        self.table_performance.setHorizontalHeaderLabels([
-            "رقم الزوج", "عدد البطون", "إجمالي البيض", "إجمالي الفروخ", "نسبة الفقس", "حالة الزوج"
-        ])
-        
-        self.table_performance.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.table_performance.setStyleSheet("""
+    layout.addLayout(grid)
+
+    # جدول تقرير كفاءة الأزواج
+    tbl_title = QLabel('تقرير كفاءة وأداء الأزواج التفصيلي')
+    tbl_title.setStyleSheet(
+        'color: #FFFFFF; font-size: 16px; font-weight: bold; margin-top: 10px;'
+    )
+    layout.addWidget(tbl_title)
+
+    self.table_performance = QTableWidget()
+    self.table_performance.setColumnCount(6)
+    self.table_performance.setHorizontalHeaderLabels([
+        'رقم الزوج',
+        'عدد البطون',
+        'إجمالي البيض',
+        'إجمالي الفروخ',
+        'نسبة الفقس',
+        'حالة الزوج',
+    ])
+
+    self.table_performance.horizontalHeader().setSectionResizeMode(
+        QHeaderView.Stretch
+    )
+    self.table_performance.setStyleSheet("""
             QTableWidget {
                 background-color: #2D3748;
                 color: #FFFFFF;
                 gridline-color: #4A5568;
                 border: none;
                 border-radius: 8px;
+                font-size: 13px;
             }
             QHeaderView::section {
                 background-color: #1A202C;
                 color: #A0AEC0;
-                padding: 8px;
+                padding: 10px;
                 font-weight: bold;
                 border: none;
             }
             QTableWidget::item { padding: 6px; }
         """)
-        layout.addWidget(self.table_performance)
+    layout.addWidget(self.table_performance)
 
-    def load_statistics(self):
-        conn = get_connection()
-        cursor = conn.cursor()
+  def load_statistics(self):
+    conn = get_connection()
+    cursor = conn.cursor()
 
-        # الإحصائيات العامة
-        cursor.execute("SELECT COUNT(*) FROM pairs")
-        pairs_cnt = cursor.fetchone()[0]
+    # دالة مساعدة للاستخراج الآمن للقيمة
+    def get_val(res):
+      if not res:
+        return 0
+      if isinstance(res, dict):
+        return list(res.values())[0]
+      return res[0]
 
-        cursor.execute("SELECT COUNT(*) FROM chicks")
-        chicks_cnt = cursor.fetchone()[0]
+    # الإحصائيات العامة
+    cursor.execute('SELECT COUNT(*) FROM pairs')
+    pairs_cnt = get_val(cursor.fetchone())
 
-        cursor.execute("SELECT COUNT(*) FROM chicks WHERE status = 'محتفظ به'")
-        kept_cnt = cursor.fetchone()[0]
+    cursor.execute('SELECT COUNT(*) FROM chicks')
+    chicks_cnt = get_val(cursor.fetchone())
 
-        cursor.execute("SELECT COUNT(*) FROM chicks WHERE status = 'تم البيع'")
-        sold_chicks_cnt = cursor.fetchone()[0]
+    cursor.execute("SELECT COUNT(*) FROM chicks WHERE status = 'محتفظ به'")
+    kept_cnt = get_val(cursor.fetchone())
 
-        cursor.execute("SELECT COALESCE(SUM(eggs_count), 0), COALESCE(SUM(chicks_count), 0) FROM production")
-        total_eggs, total_hatched = cursor.fetchone()
-        
-        hatch_rate_gen = round((total_hatched / total_eggs) * 100, 1) if total_eggs > 0 else 0
+    cursor.execute("SELECT COUNT(*) FROM chicks WHERE status = 'تم البيع'")
+    sold_chicks_cnt = get_val(cursor.fetchone())
 
-        # أكثر زوج إنتاجاً
-        cursor.execute("""
+    cursor.execute(
+        'SELECT COALESCE(SUM(eggs_count), 0) AS total_eggs,'
+        ' COALESCE(SUM(chicks_count), 0) AS total_chicks FROM production'
+    )
+    res_prod = cursor.fetchone()
+
+    if isinstance(res_prod, dict):
+      total_eggs = res_prod.get('total_eggs', 0)
+      total_hatched = res_prod.get('total_chicks', 0)
+    elif res_prod and len(res_prod) >= 2:
+      total_eggs, total_hatched = res_prod[0], res_prod[1]
+    else:
+      total_eggs, total_hatched = 0, 0
+
+    hatch_rate_gen = (
+        round((total_hatched / total_eggs) * 100, 1) if total_eggs > 0 else 0
+    )
+
+    # أكثر زوج إنتاجاً
+    cursor.execute("""
             SELECT pair_number, SUM(chicks_count) as total_c 
             FROM production 
             GROUP BY pair_number 
             ORDER BY total_c DESC 
             LIMIT 1
         """)
-        best_pair_row = cursor.fetchone()
-        best_pair_str = f"زوج {best_pair_row[0]}" if best_pair_row else "لا يوجد"
-        best_pair_sub = f"إنتاج: {best_pair_row[1]} فرخ" if best_pair_row else ""
+    best_pair_row = cursor.fetchone()
 
-        self.box_pairs.update_value(pairs_cnt)
-        self.box_chicks.update_value(chicks_cnt)
-        self.box_kept.update_value(kept_cnt)
-        self.box_hatch_rate.update_value(f"{hatch_rate_gen}%", f"بيض: {total_eggs} | فروخ: {total_hatched}")
-        self.box_sold_chicks.update_value(sold_chicks_cnt)
-        self.box_best_pair.update_value(best_pair_str, best_pair_sub)
+    if best_pair_row and isinstance(best_pair_row, dict):
+      p_num_best = best_pair_row.get('pair_number')
+      total_c_best = best_pair_row.get('total_c', 0)
+      best_pair_str = f'زوج {p_num_best}' if p_num_best else 'لا يوجد'
+      best_pair_sub = f'إنتاج: {total_c_best} فرخ' if p_num_best else ''
+    elif best_pair_row:
+      best_pair_str = f'زوج {best_pair_row[0]}'
+      best_pair_sub = f'إنتاج: {best_pair_row[1]} فرخ'
+    else:
+      best_pair_str = 'لا يوجد'
+      best_pair_sub = ''
 
-        # تحميل جدول تقرير كفاءة الأزواج
-        query = """
+    self.box_pairs.update_value(pairs_cnt)
+    self.box_chicks.update_value(chicks_cnt)
+    self.box_kept.update_value(kept_cnt)
+    self.box_hatch_rate.update_value(
+        f'{hatch_rate_gen}%', f'بيض: {total_eggs} | فروخ: {total_hatched}'
+    )
+    self.box_sold_chicks.update_value(sold_chicks_cnt)
+    self.box_best_pair.update_value(best_pair_str, best_pair_sub)
+
+    # تحميل جدول تقرير كفاءة الأزواج
+    query = """
             SELECT 
                 p.pair_number,
                 p.status,
@@ -167,33 +230,42 @@ class StatisticsPage(QWidget):
             FROM pairs p
             LEFT JOIN production pr ON p.pair_number = pr.pair_number
             GROUP BY p.pair_number, p.status
-            ORDER BY total_chicks DESC, total_eggs DESC
+            ORDER BY 
+                CASE 
+                    WHEN p.pair_number ~ '^[0-9]+$' THEN CAST(p.pair_number AS INTEGER)
+                    ELSE 999999 
+                END ASC, 
+                p.pair_number ASC
         """
-        cursor.execute(query)
-        rows = cursor.fetchall()
-        conn.close()
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    conn.close()
 
-        self.table_performance.setRowCount(0)
-        for row_idx, row in enumerate(rows):
-            self.table_performance.insertRow(row_idx)
+    self.table_performance.setRowCount(0)
+    for row_idx, row in enumerate(rows):
+      self.table_performance.insertRow(row_idx)
 
-            p_num = str(row['pair_number'])
-            c_cnt = str(row['clutch_count'])
-            e_cnt = row['total_eggs']
-            ch_cnt = row['total_chicks']
-            p_status = str(row['status'] or '-')
+      p_num = str(row['pair_number'])
+      c_cnt = str(row['clutch_count'])
+      e_cnt = row['total_eggs']
+      ch_cnt = row['total_chicks']
+      p_status = str(row['status'] or '-')
 
-            rate = round((ch_cnt / e_cnt) * 100, 1) if e_cnt > 0 else 0.0
-            rate_str = f"{rate}%"
+      rate = round((ch_cnt / e_cnt) * 100, 1) if e_cnt > 0 else 0.0
+      rate_str = f'{rate}%'
 
-            self.table_performance.setItem(row_idx, 0, QTableWidgetItem(p_num))
-            self.table_performance.setItem(row_idx, 1, QTableWidgetItem(c_cnt))
-            self.table_performance.setItem(row_idx, 2, QTableWidgetItem(str(e_cnt)))
-            self.table_performance.setItem(row_idx, 3, QTableWidgetItem(str(ch_cnt)))
-            self.table_performance.setItem(row_idx, 4, QTableWidgetItem(rate_str))
-            self.table_performance.setItem(row_idx, 5, QTableWidgetItem(p_status))
+      self.table_performance.setItem(row_idx, 0, QTableWidgetItem(p_num))
+      self.table_performance.setItem(row_idx, 1, QTableWidgetItem(c_cnt))
+      self.table_performance.setItem(
+          row_idx, 2, QTableWidgetItem(str(e_cnt))
+      )
+      self.table_performance.setItem(
+          row_idx, 3, QTableWidgetItem(str(ch_cnt))
+      )
+      self.table_performance.setItem(row_idx, 4, QTableWidgetItem(rate_str))
+      self.table_performance.setItem(row_idx, 5, QTableWidgetItem(p_status))
 
-            for col in range(6):
-                item = self.table_performance.item(row_idx, col)
-                if item:
-                    item.setTextAlignment(Qt.AlignCenter)
+      for col in range(6):
+        item = self.table_performance.item(row_idx, col)
+        if item:
+          item.setTextAlignment(Qt.AlignCenter)
