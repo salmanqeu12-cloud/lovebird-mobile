@@ -12,7 +12,9 @@ import requests
 
 # إعدادات Supabase Storage
 SUPABASE_URL = "https://vryzzhnokjxynoxsxspk.supabase.co"
-SUPABASE_KEY = "sb_publishable_1bxIOEL10UlzC-ct6tgc0g_0SD6l"
+SUPABASE_KEY = (
+    "sb_publishable_1bxIOEL10UlzC-ct6tgc0g_0SD6l"  # الصق مفتاحك كاملاً هنا
+)
 BUCKET_NAME = "lovebird-media"
 
 
