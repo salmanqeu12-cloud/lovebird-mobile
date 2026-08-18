@@ -9,31 +9,28 @@ st.set_page_config(
     page_title="Lovebird Manager", page_icon="🦜", layout="centered"
 )
 
-# تنسيق CSS لضبط اتجاه النصوص والجدول لليمين بشكل سليم
+# ضبط التنسيق للغة العربية ودعم شاشات الجوال بدون التأثير على عناصر القائمة الداخلية
 st.markdown(
     """
     <style>
-    html, body, [class*="css"] {
-        direction: rtl;
-        text-align: right;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
     .stDataFrame {
         direction: rtl;
     }
-    /* ضمان ظهور العناوين بشكل سليم دون تقطيع عمودي */
-    h1, h2, h3, h4, h5, h6 {
-        direction: rtl;
-        text-align: right;
+    .alert-card {
+        background-color: #2D3748;
+        border-right: 6px solid #F6E05E;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 12px;
     }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# العنوان بالعربي بالكامل لضمان عدم تقطيع الحروف
-st.title("🦜 إدارة مزرعة الروز - النسخة المحمولة")
+st.title("🦜 Lovebird Manager - الجوال")
 
+# استخدام label_visibility="collapsed" لمنع تكسر كلمة "القائمة" عمودياً في الجوال
 menu = st.sidebar.selectbox(
     "القائمة",
     [
@@ -47,6 +44,7 @@ menu = st.sidebar.selectbox(
         "الفروخ",
         "إضافة طير جديد",
     ],
+    label_visibility="collapsed",
 )
 
 conn = get_connection()
@@ -269,7 +267,7 @@ elif menu == "🚨 تنبيهات الحضن والفقس":
                 with st.container():
                     st.markdown(
                         f"""
-                        <div style="background-color: #2D3748; border-right: 6px solid {border_color}; border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; direction: rtl; text-align: right;">
+                        <div style="background-color: #2D3748; border-right: 6px solid {border_color}; border-radius: 8px; padding: 12px 16px; margin-bottom: 12px;">
                             <h4 style="color: white; margin: 0 0 5px 0;">🦜 زوج رقم: {c['pair_number']} | بطن رقم: {c['clutch_number']}</h4>
                             <p style="color: #E2E8F0; font-weight: bold; margin: 0 0 5px 0;">{status_tag}</p>
                             <p style="color: #CBD5E0; font-size: 13px; margin: 0;">
