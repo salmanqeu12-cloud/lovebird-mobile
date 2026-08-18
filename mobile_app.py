@@ -3,48 +3,36 @@ import pandas as pd
 from app.database import get_connection
 from app.services import compress_and_upload_image
 import streamlit as st
-import streamlit.components.v1 as components
 
 # إعدادات الصفحة للجوال
 st.set_page_config(
     page_title="Lovebird Manager", page_icon="🦜", layout="centered"
 )
 
-# فرض اتجاه الصفحة بالكامل إلى اليمين (RTL) من جذور المتصفح لحل مشكلة تقطيع الحروف
-components.html(
-    """
-    <script>
-        var doc = window.parent.document;
-        doc.documentElement.setAttribute('dir', 'rtl');
-        doc.documentElement.setAttribute('lang', 'ar');
-    </script>
-    """,
-    height=0,
-)
-
-# تنسيقات CSS إضافية لضمان ترتيب الجداول والعناصر
+# تنسيق CSS لضبط اتجاه النصوص والجدول لليمين بشكل سليم
 st.markdown(
     """
     <style>
     html, body, [class*="css"] {
-        direction: rtl !important;
-        text-align: right !important;
+        direction: rtl;
+        text-align: right;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .stDataFrame {
-        direction: rtl !important;
-    }
-    /* منع تقطيع الكلمات في العناوين والقوائم */
-    h1, h2, h3, h4, h5, h6, span, p, label, div {
         direction: rtl;
-        unicode-bidi: plaintext;
+    }
+    /* ضمان ظهور العناوين بشكل سليم دون تقطيع عمودي */
+    h1, h2, h3, h4, h5, h6 {
+        direction: rtl;
+        text-align: right;
     }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-st.title("🦜 Lovebird Manager - الجوال")
+# العنوان بالعربي بالكامل لضمان عدم تقطيع الحروف
+st.title("🦜 إدارة مزرعة الروز - النسخة المحمولة")
 
 menu = st.sidebar.selectbox(
     "القائمة",
