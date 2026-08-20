@@ -1,0 +1,26 @@
+name: Send Daily Telegram Alerts
+
+on:
+  schedule:
+    # 7:00 AM بتوقيت البحرين (4:00 AM UTC)
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests psycopg2-binary supabase
+
+      - name: Run Alert Bot
+        run: python telegram_bot.py
